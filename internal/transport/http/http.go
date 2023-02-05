@@ -3,7 +3,8 @@ package http
 import (
 	"encoding/json"
 	"net/http"
-	"test/internal/app"
+
+	"github.com/adYushinW/RestAPi/internal/app"
 )
 
 func Service(app *app.App) error {

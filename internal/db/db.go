@@ -2,7 +2,8 @@ package db
 
 import (
 	"database/sql"
-	"test/internal/model"
+
+	"github.com/adYushinW/RestAPi/internal/model"
 )
 
 type Database struct {

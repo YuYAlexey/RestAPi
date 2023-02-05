@@ -1,8 +1,8 @@
 package app
 
 import (
-	"test/internal/db"
-	"test/internal/model"
+	"github.com/adYushinW/RestAPi/internal/db"
+	"github.com/adYushinW/RestAPi/internal/model"
 )
 
 type App struct {

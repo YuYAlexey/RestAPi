@@ -3,9 +3,10 @@ package main
 import (
 	"log"
 	"os"
-	"test/internal/app"
-	"test/internal/db"
-	"test/internal/transport/http"
+
+	"github.com/adYushinW/RestAPi/internal/app"
+	"github.com/adYushinW/RestAPi/internal/db"
+	"github.com/adYushinW/RestAPi/internal/transport/http"
 )
 
 func main() {
