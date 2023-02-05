@@ -1,24 +1,24 @@
 package main
 
 import (
-	"net/http"
-	"test/api"
-	"test/connect/db"
-
-	"github.com/gin-gonic/gin"
+	"log"
+	"os"
+	"test/internal/app"
+	"test/internal/db"
+	"test/internal/transport/http"
 )
 
 func main() {
-	route := gin.Default()
-	d := &db.Database{}
-	d.ConnectDB()
+	db, err := db.New()
+	if err != nil {
+		log.Fatalln(err)
+		os.Exit(2)
+	}
 
-	route.GET("/", func(context *gin.Context) {
-		context.JSON(http.StatusOK, gin.H{"message": "Hello"})
-	})
+	app := app.New(db)
 
-	api := &api.Todoinfo{}
-	route.GET("/all", api.GetAll)
-
-	route.Run()
+	if err := http.Service(app); err != nil {
+		log.Fatalln(err)
+		os.Exit(2)
+	}
 }
