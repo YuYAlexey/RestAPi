@@ -51,7 +51,7 @@ func (db *Database) GetAllTodo() ([]*model.Todo, error) {
 }
 
 func (db *Database) GetAllSortByDate() ([]*model.Todo, error) {
-	query := "SELECT id, state, date, name FROM info order by date"
+	query := "SELECT id, state, date, name FROM info ORDER BY date"
 
 	rows, err := db.conn.Query(query)
 
@@ -80,8 +80,10 @@ func (db *Database) GetAllSortByDate() ([]*model.Todo, error) {
 	return result, nil
 }
 
-func (db *Database) GetAllSortUnDone() ([]*model.Todo, error) {
-	query := "select * from info order by state asc"
+// TODO: Ебать тебя за *. Исправить на поля
+// TODO: ASC по дефолту, можно убрать
+func (db *Database) GetAllSortUndone() ([]*model.Todo, error) {
+	query := "SELECT * FROM info ORDER BY state ASC"
 
 	rows, err := db.conn.Query(query)
 	if err != nil {
@@ -109,6 +111,7 @@ func (db *Database) GetAllSortUnDone() ([]*model.Todo, error) {
 	return result, nil
 }
 
+// TODO: Заменить регистр в запросе
 func (db *Database) GetAllState(sort string) ([]*model.Todo, error) {
 	query := "select * from info where state = $1"
 
@@ -138,6 +141,9 @@ func (db *Database) GetAllState(sort string) ([]*model.Todo, error) {
 	return result, nil
 }
 
+// TODO: сделать получение по  ID
+// TODO: Заменить регистр в запросе
+// TODO: Зачем тут массив в return? убрать
 func (db *Database) GetOnlyOne() ([]*model.Todo, error) {
 
 	query := "select * from info limit 1"

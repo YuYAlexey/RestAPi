@@ -73,6 +73,7 @@ func Service(app *app.App) error {
 		w.Write(response)
 	})
 
+	// TODO: заменить на /todo/{id}
 	http.HandleFunc("/one", func(w http.ResponseWriter, r *http.Request) {
 
 		todos, err := app.GetOnlyOne()
