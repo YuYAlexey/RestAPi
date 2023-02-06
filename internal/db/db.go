@@ -149,13 +149,13 @@ func (db *Database) GetOnlyOne(id string) ([]*model.Todo, error) {
 
 	query := "SELECT id, state, date, name FROM info WHERE ID = $1"
 
-	rows := db.conn.QueryRow(query, id)
+	row := db.conn.QueryRow(query, id)
 
 	result := make([]*model.Todo, 0)
 
 	todo := new(model.Todo)
 
-	err := rows.Scan(&todo.ID, &todo.State, &todo.Date, &todo.Name)
+	err := row.Scan(&todo.ID, &todo.State, &todo.Date, &todo.Name)
 
 	if err != nil {
 		return result, nil
@@ -204,8 +204,31 @@ func (db *Database) GetSomeRow(state string, date1 string, date2 string, limit s
 	}
 
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return result, err
 	}
 
 	return result, nil
+}
+
+func (db *Database) AddNew(state bool, date string, name string) ([]*model.Todo, error) {
+	fmt.Println(state, date, name)
+	query := "INSERT INTO info (state, date, name) VALUES ($1, $2, $3) RETURNING id, state, date, name"
+
+	fmt.Println(query)
+
+	row := db.conn.QueryRow(query, state, date, name)
+
+	result := make([]*model.Todo, 0)
+
+	todo := new(model.Todo)
+
+	err := row.Scan(&todo.ID, &todo.State, &todo.Date, &todo.Name)
+
+	if err != nil {
+		return result, err
+	}
+
+	result = append(result, todo)
+
+	return result, err
 }

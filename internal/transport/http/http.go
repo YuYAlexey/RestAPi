@@ -3,6 +3,7 @@ package http
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/adYushinW/RestAPi/internal/app"
 )
@@ -123,6 +124,31 @@ func Service(app *app.App) error {
 		limit := r.URL.Query().Get("limit")
 
 		todos, err := app.GetSomeRow(state, date1, date2, limit)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		response, err := json.Marshal(todos)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(response)
+	})
+
+	http.HandleFunc("/todo/add", func(w http.ResponseWriter, r *http.Request) {
+
+		state, _ := strconv.ParseBool(r.URL.Query().Get("state"))
+		date := r.URL.Query().Get("date")
+		name := r.URL.Query().Get("name")
+
+		todos, err := app.AddNew(state, date, name)
 
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)

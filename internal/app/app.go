@@ -38,3 +38,7 @@ func (a *App) GetOnlyOne(id string) ([]*model.Todo, error) {
 func (a *App) GetSomeRow(state string, date1 string, date2 string, limit string) ([]*model.Todo, error) {
 	return a.db.GetSomeRow(state, date1, date2, limit)
 }
+
+func (a *App) AddNew(state bool, date string, name string) ([]*model.Todo, error) {
+	return a.db.AddNew(state, date, name)
+}
