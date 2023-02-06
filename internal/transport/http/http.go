@@ -115,5 +115,31 @@ func Service(app *app.App) error {
 		w.Write(response)
 	})
 
+	http.HandleFunc("/todo/row", func(w http.ResponseWriter, r *http.Request) {
+
+		state := r.URL.Query().Get("state")
+		date1 := r.URL.Query().Get("date1")
+		date2 := r.URL.Query().Get("date2")
+		limit := r.URL.Query().Get("limit")
+
+		todos, err := app.GetSomeRow(state, date1, date2, limit)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		response, err := json.Marshal(todos)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(response)
+	})
+
 	return http.ListenAndServe(":8080", nil)
 }

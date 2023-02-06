@@ -34,3 +34,7 @@ func (a *App) GetAllState(sort string) ([]*model.Todo, error) {
 func (a *App) GetOnlyOne(id string) ([]*model.Todo, error) {
 	return a.db.GetOnlyOne(id)
 }
+
+func (a *App) GetSomeRow(state string, date1 string, date2 string, limit string) ([]*model.Todo, error) {
+	return a.db.GetSomeRow(state, date1, date2, limit)
+}
