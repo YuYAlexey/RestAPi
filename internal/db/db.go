@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/adYushinW/RestAPi/internal/model"
 )
@@ -50,8 +51,13 @@ func (db *Database) GetAllTodo() ([]*model.Todo, error) {
 	return result, nil
 }
 
-func (db *Database) GetAllSortByDate() ([]*model.Todo, error) {
-	query := "SELECT id, state, date, name FROM info ORDER BY date"
+func (db *Database) GetAllSort(sort string) ([]*model.Todo, error) {
+
+	if len(sort) == 0 {
+		return nil, nil
+	}
+
+	query := fmt.Sprintf("SELECT id, state, date, name FROM info ORDER BY %s ", sort)
 
 	rows, err := db.conn.Query(query)
 
@@ -80,10 +86,9 @@ func (db *Database) GetAllSortByDate() ([]*model.Todo, error) {
 	return result, nil
 }
 
-// TODO: Ебать тебя за *. Исправить на поля
-// TODO: ASC по дефолту, можно убрать
 func (db *Database) GetAllSortUndone() ([]*model.Todo, error) {
-	query := "SELECT * FROM info ORDER BY state ASC"
+
+	query := "SELECT id, state, date, name FROM info ORDER BY state"
 
 	rows, err := db.conn.Query(query)
 	if err != nil {
@@ -111,9 +116,8 @@ func (db *Database) GetAllSortUndone() ([]*model.Todo, error) {
 	return result, nil
 }
 
-// TODO: Заменить регистр в запросе
 func (db *Database) GetAllState(sort string) ([]*model.Todo, error) {
-	query := "select * from info where state = $1"
+	query := "SELECT id, state, date, name FROM info WHERE state = $1"
 
 	rows, err := db.conn.Query(query, sort)
 	if err != nil {
@@ -141,35 +145,23 @@ func (db *Database) GetAllState(sort string) ([]*model.Todo, error) {
 	return result, nil
 }
 
-// TODO: сделать получение по  ID
-// TODO: Заменить регистр в запросе
-// TODO: Зачем тут массив в return? убрать
-func (db *Database) GetOnlyOne() ([]*model.Todo, error) {
+func (db *Database) GetOnlyOne(id string) ([]*model.Todo, error) {
 
-	query := "select * from info limit 1"
+	query := "SELECT id, state, date, name FROM info WHERE ID = $1"
 
-	rows, err := db.conn.Query(query)
-	if err != nil {
-		return nil, err
-	}
-
-	defer rows.Close()
+	rows := db.conn.QueryRow(query, id)
 
 	result := make([]*model.Todo, 0)
 
-	for rows.Next() {
-		todo := new(model.Todo)
+	todo := new(model.Todo)
 
-		if err := rows.Scan(&todo.ID, &todo.State, &todo.Date, &todo.Name); err != nil {
-			continue
-		}
+	err := rows.Scan(&todo.ID, &todo.State, &todo.Date, &todo.Name)
 
-		result = append(result, todo)
+	if err != nil {
+		return result, nil
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
+	result = append(result, todo)
 
 	return result, nil
 }

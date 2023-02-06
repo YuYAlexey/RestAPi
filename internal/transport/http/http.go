@@ -32,9 +32,30 @@ func Service(app *app.App) error {
 		w.Write(response)
 	})
 
-	http.HandleFunc("/todo/date", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/todo/sort", func(w http.ResponseWriter, r *http.Request) {
+		sort := r.URL.Query().Get("key1")
 
-		todos, err := app.GetAllSortByDate()
+		todos, err := app.GetAllSort(sort)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		response, err := json.Marshal(todos)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(response)
+	})
+
+	http.HandleFunc("/todo/Undone", func(w http.ResponseWriter, r *http.Request) {
+
+		todos, err := app.GetAllSortUndone()
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
@@ -73,10 +94,10 @@ func Service(app *app.App) error {
 		w.Write(response)
 	})
 
-	// TODO: заменить на /todo/{id}
 	http.HandleFunc("/one", func(w http.ResponseWriter, r *http.Request) {
+		id := r.URL.Query().Get("id")
 
-		todos, err := app.GetOnlyOne()
+		todos, err := app.GetOnlyOne(id)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
