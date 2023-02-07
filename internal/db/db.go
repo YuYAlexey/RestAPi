@@ -211,12 +211,31 @@ func (db *Database) GetSomeRow(state string, date1 string, date2 string, limit s
 }
 
 func (db *Database) AddNew(state bool, date string, name string) ([]*model.Todo, error) {
-	fmt.Println(state, date, name)
+
 	query := "INSERT INTO info (state, date, name) VALUES ($1, $2, $3) RETURNING id, state, date, name"
 
-	fmt.Println(query)
-
 	row := db.conn.QueryRow(query, state, date, name)
+
+	result := make([]*model.Todo, 0)
+
+	todo := new(model.Todo)
+
+	err := row.Scan(&todo.ID, &todo.State, &todo.Date, &todo.Name)
+
+	if err != nil {
+		return result, err
+	}
+
+	result = append(result, todo)
+
+	return result, err
+}
+
+func (db *Database) ChangeStatus(id string, state bool) ([]*model.Todo, error) {
+
+	query := "UPDATE info SET state = $2 WHERE id = $1 RETURNING id, state, date, name"
+
+	row := db.conn.QueryRow(query, id, state)
 
 	result := make([]*model.Todo, 0)
 

@@ -42,3 +42,7 @@ func (a *App) GetSomeRow(state string, date1 string, date2 string, limit string)
 func (a *App) AddNew(state bool, date string, name string) ([]*model.Todo, error) {
 	return a.db.AddNew(state, date, name)
 }
+
+func (a *App) ChangeStatus(id string, state bool) ([]*model.Todo, error) {
+	return a.db.ChangeStatus(id, state)
+}

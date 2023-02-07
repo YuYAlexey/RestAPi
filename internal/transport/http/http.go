@@ -167,5 +167,29 @@ func Service(app *app.App) error {
 		w.Write(response)
 	})
 
+	http.HandleFunc("/todo/change", func(w http.ResponseWriter, r *http.Request) {
+
+		id := r.URL.Query().Get("id")
+		state, _ := strconv.ParseBool(r.URL.Query().Get("state"))
+
+		todos, err := app.ChangeStatus(id, state)
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		response, err := json.Marshal(todos)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(response)
+	})
+
 	return http.ListenAndServe(":8080", nil)
 }
