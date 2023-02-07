@@ -191,5 +191,28 @@ func Service(app *app.App) error {
 		w.Write(response)
 	})
 
+	http.HandleFunc("/todo/delete", func(w http.ResponseWriter, r *http.Request) {
+
+		id, err := strconv.Atoi(r.URL.Query().Get("id"))
+
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte(err.Error()))
+			return
+		}
+
+		todos, _ := app.Delete(id)
+
+		response, err := json.Marshal(todos)
+		if err != nil {
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(response)
+	})
+
 	return http.ListenAndServe(":8080", nil)
 }

@@ -46,3 +46,7 @@ func (a *App) AddNew(state bool, date string, name string) ([]*model.Todo, error
 func (a *App) ChangeStatus(id string, state bool) ([]*model.Todo, error) {
 	return a.db.ChangeStatus(id, state)
 }
+
+func (a *App) Delete(id int) (bool, error) {
+	return a.db.Delete(id)
+}

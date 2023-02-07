@@ -251,3 +251,20 @@ func (db *Database) ChangeStatus(id string, state bool) ([]*model.Todo, error) {
 
 	return result, err
 }
+
+func (db *Database) Delete(id int) (bool, error) {
+
+	query := "DELETE FROM info WHERE id = $1"
+
+	row := db.conn.QueryRow(query, id)
+
+	todo := new(model.Todo)
+
+	err := row.Scan(&todo.ID)
+
+	if err == sql.ErrNoRows {
+		return true, err
+	}
+
+	return false, err
+}
