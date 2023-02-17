@@ -8,42 +8,46 @@ import (
 )
 
 func Error(r *http.Request, level string, code int, errr error) {
-	file, err := os.OpenFile(
-		"RESTAPI.log",
-		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		0664,
-	)
+	file, err := os.OpenFile("restapi.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		panic(err)
 	}
 
 	defer file.Close()
 
-	logger := zerolog.New(os.Stdout).With().Timestamp().Caller().Logger()
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	logger := zerolog.New(file).With().Timestamp().Logger()
 	logger.Error().
 		Str("level", level).
+		Str("method", r.Method).
 		Str("URL", r.RequestURI).
 		Str("method", r.Method).
+		Str("user_agent", r.UserAgent()).
 		Int("code", code).
-		Err(errr)
+		Err(errr).
+		Send()
+
 }
 
 func Info(r *http.Request, level string, code int, errr error) {
-	file, err := os.OpenFile(
-		"RESTAPI.log",
-		os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-		0664,
-	)
+	file, err := os.OpenFile("restapi.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0666)
 	if err != nil {
 		panic(err)
 	}
 
 	defer file.Close()
-	logger := zerolog.New(os.Stdout).With().Timestamp().Caller().Logger()
+
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+
+	logger := zerolog.New(file).With().Timestamp().Logger()
 	logger.Info().
 		Str("level", level).
+		Str("method", r.Method).
 		Str("URL", r.RequestURI).
 		Str("method", r.Method).
+		Str("user_agent", r.UserAgent()).
 		Int("code", code).
-		Err(errr)
+		Err(errr).
+		Send()
 }
