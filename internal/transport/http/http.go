@@ -10,7 +10,7 @@ import (
 	"github.com/adYushinW/RestAPi/internal/log"
 )
 
-func Service(app *app.App) error {
+func Service(app *app.App, logger log.Logger) error {
 	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("pong"))
@@ -33,7 +33,7 @@ func Service(app *app.App) error {
 				id, errr := strconv.Atoi(r.URL.Query().Get("id"))
 
 				if errors.Is(errr, strconv.ErrSyntax) {
-					log.Error(r, "http", http.StatusBadRequest, errr)
+					logger.Error(r, "http", http.StatusBadRequest, errr)
 					w.WriteHeader(http.StatusBadRequest)
 					w.Write([]byte("Wrong Request"))
 					return
@@ -60,7 +60,7 @@ func Service(app *app.App) error {
 			name := r.URL.Query().Get("name")
 
 			if errors.Is(errr, strconv.ErrSyntax) {
-				log.Error(r, "http", http.StatusBadRequest, errr)
+				logger.Error(r, "http", http.StatusBadRequest, errr)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -74,7 +74,7 @@ func Service(app *app.App) error {
 			state, _ := strconv.ParseBool(r.URL.Query().Get("state"))
 
 			if errors.Is(err, strconv.ErrSyntax) {
-				log.Error(r, "http", http.StatusBadRequest, err)
+				logger.Error(r, "http", http.StatusBadRequest, err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -87,7 +87,7 @@ func Service(app *app.App) error {
 			id, err = strconv.Atoi(r.URL.Query().Get("id"))
 
 			if errors.Is(err, strconv.ErrSyntax) {
-				log.Error(r, "http", http.StatusBadRequest, err)
+				logger.Error(r, "http", http.StatusBadRequest, err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -96,13 +96,13 @@ func Service(app *app.App) error {
 			status = http.StatusOK
 
 		default:
-			log.Info(r, "http", http.StatusBadRequest, nil)
+			logger.Info(r, "http", http.StatusBadRequest, nil)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
 		if err != nil {
-			log.Error(r, "http", http.StatusInternalServerError, err)
+			logger.Error(r, "http", http.StatusInternalServerError, err)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
