@@ -8,7 +8,6 @@ import (
 
 	"github.com/adYushinW/RestAPi/internal/app"
 	"github.com/adYushinW/RestAPi/internal/log"
-	"github.com/adYushinW/RestAPi/internal/model"
 )
 
 func Service(app *app.App) error {
@@ -19,12 +18,15 @@ func Service(app *app.App) error {
 
 	http.HandleFunc("/todo", func(w http.ResponseWriter, r *http.Request) {
 
-		var todos []*model.Todo
-		var err error
+		var (
+			respBody interface{}
+			status   int
+			err      error
+		)
 
-		switch {
+		switch r.Method {
 
-		case r.Method == http.MethodGet:
+		case http.MethodGet:
 
 			if r.URL.Query().Get("id") != "" {
 
@@ -37,7 +39,8 @@ func Service(app *app.App) error {
 					return
 				}
 
-				todos, err = app.GetOnlyOne(id)
+				respBody, err = app.GetOnlyOne(id)
+				status = http.StatusOK
 
 			} else {
 				state := r.URL.Query().Get("state")
@@ -46,10 +49,11 @@ func Service(app *app.App) error {
 				sort := r.URL.Query().Get("sort")
 				limit := r.URL.Query().Get("limit")
 
-				todos, err = app.GetTodo(state, date1, date2, sort, limit)
+				respBody, err = app.GetTodo(state, date1, date2, sort, limit)
+				status = http.StatusOK
 			}
 
-		case r.Method == http.MethodPost:
+		case http.MethodPost:
 
 			state, errr := strconv.ParseBool(r.URL.Query().Get("state"))
 			date := r.URL.Query().Get("date")
@@ -58,11 +62,13 @@ func Service(app *app.App) error {
 			if errors.Is(errr, strconv.ErrSyntax) {
 				log.Error(r, "http", http.StatusBadRequest, errr)
 				w.WriteHeader(http.StatusBadRequest)
+				return
 			}
 
-			todos, err = app.AddNew(state, date, name)
+			respBody, err = app.AddNew(state, date, name)
+			status = http.StatusOK
 
-		case r.Method == http.MethodPut:
+		case http.MethodPut:
 
 			id, _ := strconv.Atoi(r.URL.Query().Get("id"))
 			state, _ := strconv.ParseBool(r.URL.Query().Get("state"))
@@ -70,10 +76,29 @@ func Service(app *app.App) error {
 			if errors.Is(err, strconv.ErrSyntax) {
 				log.Error(r, "http", http.StatusBadRequest, err)
 				w.WriteHeader(http.StatusBadRequest)
+				return
 			}
 
-			todos, err = app.ChangeStatus(id, state)
+			respBody, err = app.ChangeStatus(id, state)
+			status = http.StatusOK
 
+		case http.MethodDelete:
+			var id int
+			id, err = strconv.Atoi(r.URL.Query().Get("id"))
+
+			if errors.Is(err, strconv.ErrSyntax) {
+				log.Error(r, "http", http.StatusBadRequest, err)
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+
+			respBody, err = app.Delete(id)
+			status = http.StatusOK
+
+		default:
+			log.Info(r, "http", http.StatusBadRequest, nil)
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 
 		if err != nil {
@@ -83,50 +108,20 @@ func Service(app *app.App) error {
 			return
 		}
 
-		response, err := json.Marshal(todos)
-		if err != nil {
-			log.Error(r, "http", http.StatusInternalServerError, err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Add("Content-Type", "application/json")
-		log.Info(r, "http", http.StatusOK, nil)
-		w.WriteHeader(http.StatusOK)
-		w.Write(response)
-	})
-
-	http.HandleFunc("/todo/delete", func(w http.ResponseWriter, r *http.Request) {
-
-		if r.Method != http.MethodDelete {
-			log.Info(r, "http", http.StatusBadRequest, nil)
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		id, err := strconv.Atoi(r.URL.Query().Get("id"))
-
-		if errors.Is(err, strconv.ErrSyntax) {
-			log.Error(r, "http", http.StatusBadRequest, err)
-			w.WriteHeader(http.StatusBadRequest)
-		}
-
-		todos, _ := app.Delete(id)
-
-		response, err := json.Marshal(todos)
-
-		if err != nil {
-			log.Error(r, "http", http.StatusInternalServerError, err)
-			w.WriteHeader(http.StatusInternalServerError)
-			return
-		}
-
-		w.Header().Add("Content-Type", "application/json")
-		log.Info(r, "http", http.StatusOK, nil)
-		w.WriteHeader(http.StatusOK)
-		w.Write(response)
-
+		response(w, status, respBody)
 	})
 
 	return http.ListenAndServe(":8080", nil)
+}
+
+func response(w http.ResponseWriter, status int, body interface{}) {
+	response, err := json.Marshal(body)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(status)
+	w.Write(response)
 }
