@@ -65,5 +65,7 @@ func (l *logger) Info(r *http.Request, level string, code int, errr error) {
 }
 
 func (l *logger) Close() {
-	l.file.Close()
+	if l.file != nil {
+		l.file.Close()
+	}
 }
