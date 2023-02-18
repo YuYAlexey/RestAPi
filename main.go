@@ -14,9 +14,6 @@ func main() {
 	}
 	defer logger.Close()
 
-	logger.Error(nil, "Error", 404, nil)
-	logger.Info(nil, "Info", 200, nil)
-
 	db, err := db.New()
 	if err != nil {
 		panic(err)
