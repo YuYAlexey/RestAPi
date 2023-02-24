@@ -8,8 +8,8 @@ import (
 )
 
 type Logger interface {
-	Error(r *http.Request, level string, code int, errr error)
-	Info(r *http.Request, level string, code int, errr error)
+	Error(r *http.Request, code int, errr error)
+	Info(r *http.Request, code int, errr error)
 	Close()
 }
 
@@ -40,10 +40,9 @@ func New(file string) (Logger, error) {
 	return l, nil
 }
 
-func (l *logger) Error(r *http.Request, level string, code int, errr error) {
+func (l *logger) Error(r *http.Request, code int, errr error) {
 
 	l.loggerErr.Error().
-		Str("level", level).
 		Str("method", r.Method).
 		Str("URL", r.RequestURI).
 		Str("user_agent", r.UserAgent()).
@@ -53,9 +52,8 @@ func (l *logger) Error(r *http.Request, level string, code int, errr error) {
 
 }
 
-func (l *logger) Info(r *http.Request, level string, code int, errr error) {
+func (l *logger) Info(r *http.Request, code int, errr error) {
 	l.loggerOut.Info().
-		Str("level", level).
 		Str("method", r.Method).
 		Str("URL", r.RequestURI).
 		Str("user_agent", r.UserAgent()).

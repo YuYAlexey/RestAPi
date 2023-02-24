@@ -7,22 +7,30 @@ import (
 	"github.com/adYushinW/RestAPi/internal/model"
 )
 
-type Database struct {
+type Database interface {
+	GetTodo(state string, date1 string, date2 string, sort string, limit string) ([]*model.Todo, error)
+	GetOnlyOne(id int) ([]*model.Todo, error)
+	AddNew(state bool, date string, name string) ([]*model.Todo, error)
+	ChangeStatus(id int, state bool) ([]*model.Todo, error)
+	Delete(id int) (bool, error)
+}
+
+type database struct {
 	conn *sql.DB
 }
 
-func New() (*Database, error) {
+func New() (Database, error) {
 	conn, err := newConnect()
 	if err != nil {
 		return nil, err
 	}
 
-	return &Database{
+	return &database{
 		conn: conn,
 	}, nil
 }
 
-func (db *Database) GetTodo(state string, date1 string, date2 string, sort string, limit string) ([]*model.Todo, error) {
+func (db *database) GetTodo(state string, date1 string, date2 string, sort string, limit string) ([]*model.Todo, error) {
 
 	query := "SELECT id, state, date, name FROM info"
 
@@ -84,7 +92,7 @@ func (db *Database) GetTodo(state string, date1 string, date2 string, sort strin
 	return result, nil
 }
 
-func (db *Database) GetOnlyOne(id int) ([]*model.Todo, error) {
+func (db *database) GetOnlyOne(id int) ([]*model.Todo, error) {
 
 	query := "SELECT id, state, date, name FROM info WHERE ID = $1"
 
@@ -105,7 +113,7 @@ func (db *Database) GetOnlyOne(id int) ([]*model.Todo, error) {
 	return result, nil
 }
 
-func (db *Database) AddNew(state bool, date string, name string) ([]*model.Todo, error) {
+func (db *database) AddNew(state bool, date string, name string) ([]*model.Todo, error) {
 
 	query := "INSERT INTO info (state, date, name) VALUES ($1, $2, $3) RETURNING id, state, date, name"
 
@@ -126,7 +134,7 @@ func (db *Database) AddNew(state bool, date string, name string) ([]*model.Todo,
 	return result, err
 }
 
-func (db *Database) ChangeStatus(id int, state bool) ([]*model.Todo, error) {
+func (db *database) ChangeStatus(id int, state bool) ([]*model.Todo, error) {
 
 	query := "UPDATE info SET state = $2 WHERE id = $1 RETURNING id, state, date, name"
 
@@ -147,7 +155,7 @@ func (db *Database) ChangeStatus(id int, state bool) ([]*model.Todo, error) {
 	return result, err
 }
 
-func (db *Database) Delete(id int) (bool, error) {
+func (db *database) Delete(id int) (bool, error) {
 
 	query := "DELETE FROM info WHERE id = $1"
 

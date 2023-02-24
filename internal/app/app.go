@@ -6,10 +6,10 @@ import (
 )
 
 type App struct {
-	db *db.Database
+	db db.Database
 }
 
-func New(db *db.Database) *App {
+func New(db db.Database) *App {
 	return &App{
 		db: db,
 	}

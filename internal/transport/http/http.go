@@ -33,7 +33,7 @@ func Service(app *app.App, logger log.Logger) error {
 				id, errr := strconv.Atoi(r.URL.Query().Get("id"))
 
 				if errors.Is(errr, strconv.ErrSyntax) {
-					logger.Error(r, "http", http.StatusBadRequest, errr)
+					logger.Error(r, http.StatusBadRequest, errr)
 					w.WriteHeader(http.StatusBadRequest)
 					w.Write([]byte("Wrong Request"))
 					return
@@ -60,7 +60,7 @@ func Service(app *app.App, logger log.Logger) error {
 			name := r.URL.Query().Get("name")
 
 			if errors.Is(errr, strconv.ErrSyntax) {
-				logger.Error(r, "http", http.StatusBadRequest, errr)
+				logger.Error(r, http.StatusBadRequest, errr)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -74,7 +74,7 @@ func Service(app *app.App, logger log.Logger) error {
 			state, _ := strconv.ParseBool(r.URL.Query().Get("state"))
 
 			if errors.Is(err, strconv.ErrSyntax) {
-				logger.Error(r, "http", http.StatusBadRequest, err)
+				logger.Error(r, http.StatusBadRequest, err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -87,7 +87,7 @@ func Service(app *app.App, logger log.Logger) error {
 			id, err = strconv.Atoi(r.URL.Query().Get("id"))
 
 			if errors.Is(err, strconv.ErrSyntax) {
-				logger.Error(r, "http", http.StatusBadRequest, err)
+				logger.Error(r, http.StatusBadRequest, err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -96,13 +96,13 @@ func Service(app *app.App, logger log.Logger) error {
 			status = http.StatusOK
 
 		default:
-			logger.Info(r, "http", http.StatusBadRequest, nil)
+			logger.Info(r, http.StatusBadRequest, nil)
 			w.WriteHeader(http.StatusBadRequest)
 			return
 		}
 
 		if err != nil {
-			logger.Error(r, "http", http.StatusInternalServerError, err)
+			logger.Error(r, http.StatusInternalServerError, err)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(err.Error()))
 			return
