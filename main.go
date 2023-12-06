@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/adYushinW/RestAPi/internal/app"
-	"github.com/adYushinW/RestAPi/internal/db"
-	"github.com/adYushinW/RestAPi/internal/log"
-	"github.com/adYushinW/RestAPi/internal/transport/http"
+	"github.com/YuYAlexey/RestAPi/internal/app"
+	"github.com/YuYAlexey/RestAPi/internal/db"
+	"github.com/YuYAlexey/RestAPi/internal/log"
+	"github.com/YuYAlexey/RestAPi/internal/transport/http"
 )
 
 func main() {

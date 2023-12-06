@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/adYushinW/RestAPi/internal/app"
-	"github.com/adYushinW/RestAPi/internal/log"
+	"github.com/YuYAlexey/RestAPi/internal/app"
+	"github.com/YuYAlexey/RestAPi/internal/log"
 )
 
 func Service(app *app.App, logger log.Logger) error {

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 
-	"github.com/adYushinW/RestAPi/internal/model"
+	"github.com/YuYAlexey/RestAPi/internal/model"
 )
 
 type Database interface {
@@ -115,7 +115,7 @@ func (db *database) GetOnlyOne(id int) ([]*model.Todo, error) {
 
 func (db *database) AddNew(state bool, date string, name string) ([]*model.Todo, error) {
 
-	query := "INSERT INTO info (state, date, name) VALUES ($1, $2, $3) RETURNING id, state, date, name"
+	query := "INSERT INTO into (state, date, name) VALUES ($1, $2, $3) RETURNING id, state, date, name"
 
 	row := db.conn.QueryRow(query, state, date, name)
 

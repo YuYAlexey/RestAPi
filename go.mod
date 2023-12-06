@@ -1,4 +1,4 @@
-module github.com/adYushinW/RestAPi
+module github.com/YuYAlexey/RestAPi
 
 go 1.18
 
